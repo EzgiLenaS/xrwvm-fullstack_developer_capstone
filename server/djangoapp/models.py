@@ -32,7 +32,7 @@ class CarMake(models.Model):
         return self.name
         # Return the name as the string representation
 
-        
+
 class CarModel(models.Model):
     car_make = models.ForeignKey(CarMake, on_delete=models.CASCADE)
     # Many-to-One relationship is above
@@ -46,8 +46,7 @@ class CarModel(models.Model):
     type = models.CharField(max_length=10, choices=CAR_TYPES, default='SUV')
     year = models.IntegerField(
         default=2023,
-        validators=[MaxValueValidator(2023),
-        MinValueValidator(2015)]
+        validators=[MaxValueValidator(2023), MinValueValidator(2015)]
         )
     # Other fields as needed
 

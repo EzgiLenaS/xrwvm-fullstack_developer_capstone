@@ -1,9 +1,9 @@
 # Uncomment the required imports before adding the code
 
-from django.shortcuts import render
+# from django.shortcuts import render
 # from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.models import User
-#cfrom django.shortcuts import get_object_or_404, redirect
+# from django.shortcuts import get_object_or_404, redirect
 from django.contrib.auth import logout
 # from django.contrib import messages
 # from datetime import datetime
@@ -66,18 +66,22 @@ def registration(request):
         # Check if user already exists
         User.objects.get(username=username)
         username_exist = True
-    except:
-        # If not, simply log this is a new user
+    except KeyError as e:
+        # Handle a specific KeyError
+        logger.debug("KeyError: {}".format(e))
         logger.debug("{} is new user".format(username))
-
+    except Exception as e:
+        # Handle any other exceptions
+        logger.debug("An unexpected error occurred: {}".format(e))
+        logger.debug("{} is new user".format(username))
     # If it is a new user
     if not username_exist:
         # Create user in auth_user table
         user = User.objects.create_user(
-            username=username, 
-            first_name=first_name, 
-            last_name=last_name, 
-            password=password, 
+            username=username,
+            first_name=first_name,
+            last_name=last_name,
+            password=password,
             email=email
             )
         # Login the user and redirect to list page
@@ -98,8 +102,11 @@ def get_cars(request):
     car_models = CarModel.objects.select_related('car_make')
     cars = []
     for car_model in car_models:
-        cars.append({"CarModel": car_model.name, "CarMake": car_model.car_make.name})
-    return JsonResponse({"CarModels":cars})
+        cars.append({
+            "CarModel": car_model.name, 
+            "CarMake": car_model.car_make.name
+            })
+    return JsonResponse({"CarModels": cars})
 
 
 # # Update the `get_dealerships` view to render the index page with
@@ -126,7 +133,10 @@ def get_dealer_reviews(request, dealer_id):
         endpoint = "/fetchReviews/dealer/"+str(dealer_id)
         reviews = get_request(endpoint)
         if reviews is None:
-            return JsonResponse({"status": 500, "message": "Error fetching reviews from backend."})
+            return JsonResponse({
+                "status": 500, 
+                "message": "Error fetching reviews from backend."
+                })
         for review_detail in reviews:
             response = analyze_review_sentiments(review_detail['review'])
             print(response)
@@ -158,9 +168,16 @@ def add_review(request):
     if (request.user.is_anonymous == False):
         data = json.loads(request.body)
         try:
-            response = post_review(data)
+            # response = 
+            post_review(data)
             return JsonResponse({"status": 200})
         except:
-            return JsonResponse({"status": 401, "message": "Error in posting review"})
+            return JsonResponse({
+                "status": 401,
+                "message": "Error in posting review"
+                })
     else:
-        return JsonResponse({"status": 403, "message": "Unauthorized"})
+        return JsonResponse({
+            "status": 403,
+            "message": "Unauthorized"
+            })
