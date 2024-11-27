@@ -43,12 +43,15 @@ def login_user(request):
         data = {"userName": username, "status": "Authenticated"}
     return JsonResponse(data)
 
+
 # Create a `logout_request` view to handle sign out request
 def logout_request(request):
     # ...
     logout(request)
     data = {"userName": ""}
     return JsonResponse(data)
+
+
 # Create a `registration` view to handle sign up request
 # @csrf_exempt
 def registration(request):
@@ -103,7 +106,7 @@ def get_cars(request):
     cars = []
     for car_model in car_models:
         cars.append({
-            "CarModel": car_model.name, 
+            "CarModel": car_model.name,
             "CarMake": car_model.car_make.name
             })
     return JsonResponse({"CarModels": cars})
@@ -113,7 +116,7 @@ def get_cars(request):
 # a list of dealerships
 # def get_dealerships(request):
 # ...
-# Update the `get_dealerships` render list of 
+# Update the `get_dealerships` render list of
 # dealerships all by default, particular state if state is passed
 def get_dealerships(request, state="All"):
     if (state == "All"):
@@ -134,7 +137,7 @@ def get_dealer_reviews(request, dealer_id):
         reviews = get_request(endpoint)
         if reviews is None:
             return JsonResponse({
-                "status": 500, 
+                "status": 500,
                 "message": "Error fetching reviews from backend."
                 })
         for review_detail in reviews:
@@ -165,19 +168,20 @@ def get_dealer_details(request, dealer_id):
 # def add_review(request):
 # ...
 def add_review(request):
-    if (request.user.is_anonymous == False):
+    if not request.user.is_anonymous:
         data = json.loads(request.body)
         try:
-            # response = 
+            # response =
             post_review(data)
             return JsonResponse({"status": 200})
-        except:
+        except Exception as e:
+            print(f"An error occured: {e}")
             return JsonResponse({
                 "status": 401,
                 "message": "Error in posting review"
-                })
+            })
     else:
         return JsonResponse({
             "status": 403,
             "message": "Unauthorized"
-            })
+        })
