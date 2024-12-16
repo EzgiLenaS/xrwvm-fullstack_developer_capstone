@@ -40,10 +40,14 @@ def get_request(endpoint, **kwargs):
 # request_url = sentiment_analyzer_url+"analyze/"+text
 # Add code for retrieving sentiments
 def analyze_review_sentiments(text):
-    request_url = sentiment_analyzer_url+"analyze/"+text
+    print("TEXT", text)
+    request_url = sentiment_analyzer_url+text
+    print("REQUEST_URL", request_url)
     try:
         # Call get method of requests library with URL and parameters
         response = requests.get(request_url)
+        print("RESPONSE", response)
+        print("RESPONSE.JSON", response.json())
         return response.json()
     except Exception as err:
         print(f"Unexpected {err=}, {type(err)=}")
